@@ -10,12 +10,18 @@ parser.add_argument("datafiles", nargs='*',
                     help="The path to the datafiles to plot")
 parser.add_argument("-t", "--title", default="Files touched per issue over time",
                     help="The title to use for the plot.")
+parser.add_argument("--test", action="store_true",
+                    help="Run minimal tests (shows that the imports work).")
 parser.add_argument("--ylabel", default="number of files",
                     help="The label to use for the y-axis (vertical).")
 parser.add_argument("-o", "--output", default="",
                     help="The output file. The file extension determines the type. If not set, the plot is shown interactively.")
 
 args = parser.parse_args()
+if args.test:
+    import sys
+    print("^_^ imports work, minimal test successful")
+    sys.exit(0)
 
 files_affected_log = []
 files_affected = []
