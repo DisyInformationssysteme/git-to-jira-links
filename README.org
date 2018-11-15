@@ -8,6 +8,13 @@
 - matplotlib
 - python-gpg: =pip3 install --user gpg=
 
+To get them quickly and test that everything works:
+
+#+BEGIN_SRC sh
+guix environment -l guix.scm
+for i in *.py; do python3 $i --test; done
+#+END_SRC
+
 * usage
 
 ** Retrieve commits and issue-IDs from Git repo
