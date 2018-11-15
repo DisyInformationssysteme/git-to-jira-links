@@ -71,8 +71,9 @@ The entries are ordered in commit_time order: newest commits first (they are the
 #+BEGIN_SRC sh
 # ...
 # get all jira bugs:
-./find_all_bugs.py > all-bugs.log
+# ./find_all_bugs.py --jira-api-server https://jira.HOST.TLD > all-bugs.log
 # stats
+./retrieve_commits_and_issues.py --with-files --output issues-and-files.log ./
 ./correlate_files_per_issue.py issues-and-files.log --count-files-per-issue  -i all-bugs.log | sort > files-affected-by-time-with-issue-only-bugs.dat
 ./plot.py files-affected-by-time-with-issue-only-bugs.dat
 #+END_SRC
@@ -97,6 +98,8 @@ Analyze the CSVs with graph software like [[https://gephi.org/][Gephi]].
 ** Subselect a graph for a specific module
 
 With the example of MODULE_FOO, runtime of a few hours in a 1 million line codebase.
+
+This needs ripgrep in addition to the other dependencies.
 
 #+BEGIN_SRC sh
 ./retrieve_commits_and_issues.py --with-files-and-sizes --output issues-and-files.log ./

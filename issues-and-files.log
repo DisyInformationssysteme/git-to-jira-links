@@ -1,1 +1,2 @@
-016add7c00f6da53ee3c36b227672b416419c972 TEST-123 2018-11-15 :README.org,0:correlate_files_per_issue.py,0:find_all_bugs.py,0:guix.scm,0:link_commits_to_issues.py,0:plot.py,0:retrieve_commits_and_issues.py,0:retrieve_repository_info.py,0: TEST-123 initial commit of public version---
+7e1f1f835720b51c1c293448a323932aa1607661 TEST-42 2018-11-15 :README.org,4189: TEST-42 document quick deps with guix---
+016add7c00f6da53ee3c36b227672b416419c972 TEST-123 2018-11-15 :README.org,4026:correlate_files_per_issue.py,11828:find_all_bugs.py,6255:guix.scm,1886:link_commits_to_issues.py,10438:plot.py,2056:retrieve_commits_and_issues.py,11371:retrieve_repository_info.py,3231: TEST-123 initial commit of public version---
