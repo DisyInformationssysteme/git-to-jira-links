@@ -1,0 +1,110 @@
+#+title: relink git issues to jira
+
+* requirements
+
+- dulwich ([[https://www.dulwich.io/docs/][Docs]]) 
+- swig
+- gpgme
+- python-gpg: =pip3 install --user gpg=
+
+* usage
+
+** Retrieve commits and issue-IDs from Git repo
+
+ #+BEGIN_SRC sh
+ ./retrieve_commits_and_issues.py [--with-files] [--output TODO_FILE.todo] [--previous OLD_TODO_FILE.todo] PATH_TO_GIT_REPO ...
+ #+END_SRC
+
+commit-issue pairs included in the OLD_TODO_FILE are not added to the TODO_FILE.
+
+** Store repository info
+
+#+BEGIN_SRC sh
+./retrieve_repository_info.py [--output INFO_FILE.repoinfo] PATH_TO_GIT_REPO
+#+END_SRC
+
+
+
+** Link commits to Jira
+
+#+BEGIN_SRC sh
+./link_commits_to_issues.py [--create-the-links] [--jira-api-server URL] [--netrc-gpg-path jira-netrc.gpg | --jira-user USER --jira-password PASSWORD] --repo-info-file FILE.repoinfo FILE.todo
+#+END_SRC
+
+*** credentials via netrc
+
+prepare netrc:
+#+BEGIN_SRC sh
+ echo machine jira.HOST.TLD login USER password PASSWORD | gpg2 -er MY_EMAIL@HOST.TLD > jira-netrc.gpg
+#+END_SRC
+
+* todo file format
+
+#+BEGIN_EXAMPLE
+<commit> <issue> <isodate> <message with linebreaks replaced by "---" >
+#+END_EXAMPLE
+
+There can be multiple entries per commit: one per issue referenced.
+
+The entries are ordered in commit_time order: newest commits first (they are the most important ones to have right).
+
+* History analysis
+
+** Files affected per issue
+
+#+BEGIN_SRC sh
+./retrieve_commits_and_issues.py --with-files --output issues-and-files.log ./
+./correlate_files_per_issue.py issues-and-files.log --count-files-per-issue | sort > files-affected-by-time-with-issue.dat
+./plot.py files-affected-by-time-with-issue.dat
+#+END_SRC
+
+** Only bugs
+
+#+BEGIN_SRC sh
+# ...
+# get all jira bugs:
+./find_all_bugs.py > all-bugs.log
+# stats
+./correlate_files_per_issue.py issues-and-files.log --count-files-per-issue  -i all-bugs.log | sort > files-affected-by-time-with-issue-only-bugs.dat
+./plot.py files-affected-by-time-with-issue-only-bugs.dat
+#+END_SRC
+
+** Aggregated file size of changed files per issue
+
+#+BEGIN_SRC sh
+./retrieve_commits_and_issues.py --with-files-and-sizes --output issues-and-files.log ./
+./correlate_files_per_issue.py issues-and-files.log --sum-filesizes-per-issue | sort > sum-filesize-by-time-with-issue.dat
+./plot.py sum-filesize-by-time-with-issue.dat
+#+END_SRC
+
+** Create nodelists and edgelists
+
+#+BEGIN_SRC sh
+./retrieve_commits_and_issues.py --with-files-and-sizes --output issues-and-files.log ./
+./correlate_files_per_issue.py --file-connections issues-and-files.log --debug --output-edgelist all-issues-edgelist-max300.csv --output-nodelist  all-issues-nodelist-max300.csv
+#+END_SRC
+
+Analyze the CSVs with graph software like [[https://gephi.org/][Gephi]].
+
+** Subselect a graph for a specific module
+
+With the example of MODULE_FOO, runtime of a few hours in a 1 million line codebase.
+
+#+BEGIN_SRC sh
+./retrieve_commits_and_issues.py --with-files-and-sizes --output issues-and-files.log ./
+./correlate_files_per_issue.py --file-connections issues-and-files.log --debug --output-edgelist all-issues-edgelist-max300.csv --output-nodelist  all-issues-nodelist-max300.csv
+grep MODULE_FOO all-issues-nodelist-max300.csv > all-issues-nodelist-max300-foo.csv
+cat all-issues-nodelist-max300-foo.csv | cut -d " " -f 1 > foo-nodeids-raw.txt
+time grep -wf foo-nodeids-raw.txt all-issues-edgelist-max300.csv | tee all-issues-edgelist-max300-with-foo.csv
+sed s/^/^/ foo-nodeids-raw.txt > foo-nodeids-first.txt
+sed "s/^/ /" foo-nodeids-raw.txt | sed "s/$/ /" > foo-nodeids-second.txt
+time rg -f foo-nodeids-second.txt all-issues-edgelist-max300-with-foo.csv | tee all-issues-edgelist-max300-to-foo.csv
+time rg -f foo-nodeids-first.txt all-issues-edgelist-max300-to-foo.csv | tee all-issues-edgelist-max300-from-foo.csv
+#+END_SRC
+
+Now import =all-issues-nodelist-max300-foo.csv= and =all-issues-edgelist-max300-from-foo.csv= into Gephi.
+
+** Select a specific timespan
+
+Just change the logfile from =retrieve_commits_and_issues.py= and select the lines you want. It is ordered by time, newest issue first.
+
