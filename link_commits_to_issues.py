@@ -64,7 +64,7 @@ def read_todo(filepath):
     
     >>> todofile = "testtask.todo"
     >>> list(read_todo(todofile))[:1]
-    ['ea4d74568f25d2c215b2dc8faf25eafa7e1fecfa TEST-123 test test\\n']
+    ['016add7c00f6da53ee3c36b227672b416419c972 TEST-123 2018-11-15 TEST-123 initial commit of public version---\\n']
     """
     with open(filepath) as f:
         for i in f:
@@ -102,6 +102,7 @@ def process_taskline(taskline, commit_uri_prefix):
     """Retrieve issue_id, url, and title from a taskline in a todo file.
 
     >>> process_taskline('12345 TEST-123 2018-08-12 TEST-123 foo\\n', 'http://git.HOST.TLD/my-project/my-repository/commit/')
+    ('TEST-123', 'http://git.HOST.TLD/my-project/my-repository/commit/12345', '2018-08-12 TEST-123 foo')
     """
     commit_id, issue_id, isodate, title = taskline.split(" ", 3)
     shorttitle = title.split('---')[0]

@@ -33,13 +33,13 @@ parser.add_argument("--test", action="store_true",
 def assemble_repoinfo(path):
     """ Get the information needed to re-link issues and commits from a todo file.
     >>> assemble_repoinfo(".")
-    {'commit_uri_prefix': 'https://git.HOST.TLD/internal-tools/git-to-jira-links/commit/'}
+    {'commit_uri_prefix': 'https://github.com/DisyInformationssysteme/git-to-jira-links/commit/'}
     """
     R = dulwich.repo.Repo(path)
     C = R.get_config()
     commit_uri_prefix = C.get((b"remote", b"origin"), b"url")
     # turn the commit_uri_prefix into a link
-    commit_uri_prefix = commit_uri_prefix[commit_uri_prefix.index(b"//"):]
+    commit_uri_prefix = commit_uri_prefix[commit_uri_prefix.index(b"//")+2:]
     if b"@" in commit_uri_prefix:
         commit_uri_prefix = commit_uri_prefix[commit_uri_prefix.index(b"@") + 1:]
     commit_uri_prefix = b"https://" + commit_uri_prefix + b"/commit/"
@@ -51,8 +51,8 @@ def write_repoinfo(info, filepath):
     
     >>> target = "test_repoinfo.json"
     >>> write_repoinfo(assemble_repoinfo("."), target)
-    >>> with open(target) as f: f.read()
-    '{"commit_uri_prefix": "https://git.HOST.TLD/internal-tools/git-to-jira-links/commit/"}'
+    >>> with open(target) as f: f.read().strip()
+    '{"commit_uri_prefix": "https://github.com/DisyInformationssysteme/git-to-jira-links/commit/"}'
     """
     with open(filepath, "w") as f:
         json.dump(info, f)

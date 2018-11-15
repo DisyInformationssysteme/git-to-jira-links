@@ -39,6 +39,7 @@
     (build-system python-build-system)
     (native-inputs
      `(("python-dulwich" ,python-dulwich)
+       ("python-matplotlib" ,python-matplotlib)
        ("git" ,git)
        ("python-gpg" ,python-gpg)))
     (home-page "https://github.com/DisyInformationssysteme/git-to-jira-links")

@@ -5,6 +5,7 @@
 - dulwich ([[https://www.dulwich.io/docs/][Docs]]) 
 - swig
 - gpgme
+- matplotlib
 - python-gpg: =pip3 install --user gpg=
 
 * usage

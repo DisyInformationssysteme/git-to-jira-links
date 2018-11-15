@@ -48,7 +48,7 @@ def get_jira_issue(commit_message):
     """retrieve the jira issue referenced in the commit message
 
     >>> get_jira_issue(b"BAH-123: ")
-    {b'BAHN-123'}
+    {b'BAH-123'}
     >>> messages = (
     ... b"this is jira issue named plainly BAH-123",
     ... b"BAH-123 plainly at the beginning",
@@ -62,7 +62,7 @@ def get_jira_issue(commit_message):
     >>> for issueset in issuesets:
     ...     for issue in issueset: issues.add(issue)
     >>> sorted(list(issues))
-    [b'FOO-4325', b'BAH-123']
+    [b'BAH-123', b'FOO-4325']
     >>> get_jira_issue(b"there is no issue here")
     set()
     >>> with open("tomatch.txt", "rb") as f: data = f.read().splitlines()
@@ -92,7 +92,7 @@ def get_commit_ids_and_messages(repo_path, limit=1):
     """Get up to limit commits in the given repo_path.
 
     >>> list(get_commit_ids_and_messages(".", limit=None))[-1] # the root commit of this repo
-    (b'723faf63a951eaed6de595973f23dbdfb67acba7', b'add Python skelleton\\n', 1518450170)
+    (b'016add7c00f6da53ee3c36b227672b416419c972', b'TEST-123 initial commit of public version\\n', 1542271850)
     """
     repo = dulwich.repo.Repo(repo_path)
     walker = repo.get_graph_walker()
@@ -111,7 +111,7 @@ def get_commit_ids_and_files(repo_path, limit=1, withsizes=False):
     """Get up to limit commits in the given repo_path.
 
     >>> list(get_commit_ids_and_files(".", limit=None))[-1] # the root commit of this repo
-    (b'723faf63a951eaed6de595973f23dbdfb67acba7', [b'retrieve_commits_and_issues.py'], [2044])
+    (b'016add7c00f6da53ee3c36b227672b416419c972', [b'README.org', b'correlate_files_per_issue.py', b'find_all_bugs.py', b'guix.scm', b'link_commits_to_issues.py', b'plot.py', b'retrieve_commits_and_issues.py', b'retrieve_repository_info.py'], [0, 0, 0, 0, 0, 0, 0, 0])
     """
     repo = dulwich.repo.Repo(repo_path)
     walker = repo.get_graph_walker()
@@ -161,7 +161,9 @@ def get_issue_references(repo_path, limit=1, withfiles=False, withsizes=False):
     """get all issue references and their commit IDs.
 
     >>> list(get_issue_references(".", limit=None))[-1:] # the first commit which referenced a jira issue
+    [(b'016add7c00f6da53ee3c36b227672b416419c972', b'TEST-123', b'2018-11-15', b'TEST-123 initial commit of public version\\n')]
     >>> list(get_issue_references(".", limit=None, withfiles=True))[-1:] # the first commit which referenced a jira issue
+    [(b'016add7c00f6da53ee3c36b227672b416419c972', b'TEST-123', b'2018-11-15', b'TEST-123 initial commit of public version\\n', [b'README.org', b'correlate_files_per_issue.py', b'find_all_bugs.py', b'guix.scm', b'link_commits_to_issues.py', b'plot.py', b'retrieve_commits_and_issues.py', b'retrieve_repository_info.py'], [0, 0, 0, 0, 0, 0, 0, 0])]
     """
     commits = get_commit_ids_and_messages(repo_path, limit)
     files = (get_commit_ids_and_files(repo_path, limit, withsizes=withsizes) if withfiles else None)
@@ -206,8 +208,11 @@ def get_issue_references(repo_path, limit=1, withfiles=False, withsizes=False):
 def format_todo_entry(commit_id, issue, isodate, message, files=None, sizes=None):
     """
     >>> format_todo_entry(b'123456', b'TEST-123', b'2018-03-12', b'initial version which can \\nfind issues in actual commits TEST-123\\n')
+    b'123456 TEST-123 2018-03-12 initial version which can ---find issues in actual commits TEST-123---'
     >>> format_todo_entry(b'123456', b'TEST-123', b'2018-03-12', b'initial version which can \\nfind issues in actual commits TEST-123\\n', [b'retrieve_commits_and_issues.py', b'MOO'])
+    b'123456 TEST-123 2018-03-12 :retrieve_commits_and_issues.py:MOO: initial version which can ---find issues in actual commits TEST-123---'
     >>> format_todo_entry(b'123456', b'TEST-123', b'2018-03-12', b'initial version which can \\nfind issues in actual commits TEST-123\\n', [b'retrieve_commits_and_issues.py', b'MOO'], [3769, 423])
+    b'123456 TEST-123 2018-03-12 :retrieve_commits_and_issues.py,3769:MOO,423: initial version which can ---find issues in actual commits TEST-123---'
     """
     if files is not None:
         if sizes is not None:
@@ -224,6 +229,7 @@ def format_todo_entry(commit_id, issue, isodate, message, files=None, sizes=None
 def get_commit_id_and_issue_from_todo_line(line):
     """
     >>> get_commit_id_and_issue_from_todo_line(b'123 TEST-123 initial version which can ---find issues in actual commits TEST-123---')
+    (b'123', b'TEST-123')
     """
     return (tuple(line.split()[:2]) if line.split()[1:] else None)
     

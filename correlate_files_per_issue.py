@@ -56,6 +56,7 @@ def read_todo(filepath):
     
     >>> todofile = "issues-and-files.log"
     >>> list(read_todo(todofile))[:1]
+    ['016add7c00f6da53ee3c36b227672b416419c972 TEST-123 2018-11-15 :README.org,0:correlate_files_per_issue.py,0:find_all_bugs.py,0:guix.scm,0:link_commits_to_issues.py,0:plot.py,0:retrieve_commits_and_issues.py,0:retrieve_repository_info.py,0: TEST-123 initial commit of public version---\\n']
     """
     with open(filepath) as f:
         for i in f:
