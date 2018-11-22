@@ -1,5 +1,7 @@
 #+title: relink git issues to jira
 
+See also the related [[https://blog.disy.net/relink-gitlab-jira/][blog post]] for more information!
+
 * requirements
 
 - dulwich ([[https://www.dulwich.io/docs/][Docs]]) 
