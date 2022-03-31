@@ -17,6 +17,10 @@ guix environment -l guix.scm
 for i in *.py; do python3 $i --test; done
 #+END_SRC
 
+** License
+
+Apache Public License 2.0. See COPYING.
+
 * usage
 
 ** Retrieve commits and issue-IDs from Git repo
